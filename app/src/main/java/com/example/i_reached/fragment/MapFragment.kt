@@ -16,6 +16,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import com.example.i_reached.R
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
@@ -44,6 +46,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
     private var latSearch : Double? = null
     private var longSearch : Double? = null
     private lateinit var mapCircle : Circle
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,11 +93,28 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         googleMap.setOnMyLocationButtonClickListener(this)
         googleMap.setOnMyLocationClickListener(this)
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
+            val location: Location = task.result
+            val myLocation = LatLng(location.latitude, location.longitude)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 14f))
+        }
 
-        // Add a marker in Sydney and move the camera
-        val myLocation = LatLng(28.852529, 77.081527)
-        googleMap.addMarker(MarkerOptions().position(myLocation).title("Marker in Delhi"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15f))
+        googleMap.setOnMapClickListener {
+            googleMap.addMarker(MarkerOptions().position(it))
+            mapCircle = googleMap.addCircle(
+                CircleOptions().center(it)
+                    .radius(500.0)
+                    .fillColor(R.color.green)
+                    .strokeWidth(4f)
+                    .strokeColor(Color.GREEN)
+            )
+            googleMap.addMarker(MarkerOptions().position(it))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(it))
+            coordinateTxt.text =
+                "Coordinates (${it.latitude.toFloat()}, ${it.longitude.toFloat()})"
+            llSave.visibility = View.VISIBLE
+        }
 
     }
 
@@ -222,7 +242,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
     }
 
     override fun onMyLocationButtonClick(): Boolean {
-        Toast.makeText(context, "MyLocation button clicked", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(context, "MyLocation button clicked", Toast.LENGTH_SHORT).show()
         return false
     }
 
