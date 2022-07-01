@@ -161,7 +161,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
                 googleMap.addMarker(MarkerOptions().position(latLng).title(locationText))
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
                 coordinateTxt.text =
-                    "Coordinates (${address.latitude.toFloat()}, ${address.longitude.toFloat()})"
+                    "Coordinates : (${address.latitude.toFloat()}, ${address.longitude.toFloat()})"
             }
         }
 
@@ -193,9 +193,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         }
 
         saveBtn.setOnClickListener {
-            mapCircle.radius = 0.0
-            llSave.visibility = View.GONE
-            search.text.clear()
+            if (TextUtils.isEmpty(title.text)){
+                Toast.makeText(context, "Add some title too.", Toast.LENGTH_SHORT).show()
+            } else {
+                mapCircle.radius = 0.0
+                llSave.visibility = View.GONE
+                search.text.clear()
+            }
         }
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
