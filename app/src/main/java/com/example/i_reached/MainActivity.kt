@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.appcompat.widget.Toolbar
 import com.example.i_reached.fragment.HelpFragment
 import com.example.i_reached.fragment.MapFragment
 import com.example.i_reached.fragment.PlacesFragment
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
 
     private var help : ImageView? = null
     private var bottomNavigationView : BottomNavigationView? = null
+    private lateinit var toolbar: Toolbar
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -22,6 +24,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        toolbar = findViewById(R.id.toolbarMain)
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = "I Reached?"
 
         bottomNavigationView = findViewById(R.id.bottomm)
         bottomNavigationView?.setOnNavigationItemSelectedListener {

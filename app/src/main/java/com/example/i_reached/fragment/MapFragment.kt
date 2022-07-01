@@ -1,37 +1,49 @@
 package com.example.i_reached.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import com.example.i_reached.R
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.io.IOException
 import java.lang.Exception
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MapFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener {
-    // TODO: Rename and change types of parameters
+
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var googleMap: GoogleMap
+    private lateinit var search: EditText
+    private lateinit var ivSearch: ImageView
+    private lateinit var llSave : LinearLayout
+    private lateinit var title : EditText
+    private lateinit var seekBar: SeekBar
+    private lateinit var coordinateTxt : TextView
+    private lateinit var radiusText : TextView
+    private lateinit var saveBtn : Button
+    private var latSearch : Double? = null
+    private var longSearch : Double? = null
+    private lateinit var mapCircle : Circle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,59 +54,141 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
 
     }
 
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        Toast.makeText(context, "Grant permission to access location.", Toast.LENGTH_SHORT).show()
-//    }
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Toast.makeText(context, "Grant permission to access location.", Toast.LENGTH_SHORT).show()
+    }
 
     override fun onMapReady(p0: GoogleMap) {
         googleMap = p0
-//
-//        if (ActivityCompat.checkSelfPermission(
-//                requireContext(),
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                requireContext(),
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//
-//            return
-//        }
-//
-//        googleMap.isMyLocationEnabled = true
-//        googleMap.setOnMyLocationButtonClickListener(this)
-//        googleMap.setOnMyLocationClickListener(this)
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            return
+        }
+
+        googleMap.isMyLocationEnabled = true
+        googleMap.setOnMyLocationButtonClickListener(this)
+        googleMap.setOnMyLocationClickListener(this)
 
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
         val myLocation = LatLng(28.852529, 77.081527)
         googleMap.addMarker(MarkerOptions().position(myLocation).title("Marker in Delhi"))
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15f))
 
     }
 
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ),
+            100
+        )
+    }
+
+    private fun searchLocation(view: View) {
+
+        val locationText = search.text.toString()
+        var list: List<Address>? = null
+
+        if (TextUtils.isEmpty(locationText) || locationText == "") {
+            Toast.makeText(context, "Enter location", Toast.LENGTH_SHORT).show()
+        } else {
+            val geoCoder = Geocoder(this@MapFragment.context)
+            try {
+                list = geoCoder.getFromLocationName(locationText, 1)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Toast.makeText(context, "Error : ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+            if(list!!.isEmpty()){
+                Toast.makeText(context, "No results found.", Toast.LENGTH_SHORT).show()
+            } else {
+                val address = list[0]
+                val latLng = LatLng(address.latitude, address.longitude)
+                latSearch = address.latitude
+                longSearch = address.longitude
+                mapCircle = googleMap.addCircle(
+                    CircleOptions().center(latLng)
+                        .radius(500.0)
+                        .fillColor(R.color.green)
+                        .strokeWidth(4f)
+                        .strokeColor(Color.GREEN)
+                )
+                googleMap.addMarker(MarkerOptions().position(latLng).title(locationText))
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+                coordinateTxt.text =
+                    "Coordinates (${address.latitude.toFloat()}, ${address.longitude.toFloat()})"
+            }
+        }
+
+    }
+
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
+        requestPermission()
+
         val mapView = view.findViewById<MapView>(R.id.map)
+        search = view.findViewById(R.id.search)
+        ivSearch = view.findViewById(R.id.ivSearch)
+        llSave = view.findViewById(R.id.llSave)
+        title = view.findViewById(R.id.etTitle)
+        radiusText = view.findViewById(R.id.tvRadius)
+        seekBar = view.findViewById(R.id.seekbar)
+        coordinateTxt = view.findViewById(R.id.tvCoordinates)
+        saveBtn = view.findViewById(R.id.btnSave)
+
+        ivSearch.setOnClickListener {
+            searchLocation(view)
+            llSave.visibility = View.VISIBLE
+        }
+
+        saveBtn.setOnClickListener {
+            mapCircle.radius = 0.0
+            llSave.visibility = View.GONE
+            search.text.clear()
+        }
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+               mapCircle.radius = ((seekBar.progress * 500) + 500).toDouble()
+                radiusText.text = mapCircle.radius.toString() + " m"
+            }
+        })
+
         mapView.onCreate(savedInstanceState)
         mapView.onResume()
         try {
@@ -133,7 +227,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
     }
 
     override fun onMyLocationClick(p0: Location) {
-        Toast.makeText(context, "Current location:\n", Toast.LENGTH_LONG).show()
+//        Toast.makeText(context, "Current location: $p0\n", Toast.LENGTH_LONG).show()
     }
 
 }
