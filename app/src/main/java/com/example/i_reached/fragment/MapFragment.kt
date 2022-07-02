@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import com.example.i_reached.R
+import com.example.i_reached.SQLHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
@@ -112,7 +113,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
             googleMap.addMarker(MarkerOptions().position(it))
             googleMap.animateCamera(CameraUpdateFactory.newLatLng(it))
             coordinateTxt.text =
-                "Coordinates (${it.latitude.toFloat()}, ${it.longitude.toFloat()})"
+                "Coordinates : (${it.latitude.toFloat()}, ${it.longitude.toFloat()})"
             llSave.visibility = View.VISIBLE
         }
 
@@ -147,6 +148,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
             if(list!!.isEmpty()){
                 Toast.makeText(context, "No results found.", Toast.LENGTH_SHORT).show()
             } else {
+                llSave.visibility = View.VISIBLE
                 val address = list[0]
                 val latLng = LatLng(address.latitude, address.longitude)
                 latSearch = address.latitude
@@ -175,6 +177,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
 
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
+        val DB = SQLHelper(requireContext())
+
         requestPermission()
 
         val mapView = view.findViewById<MapView>(R.id.map)
@@ -189,13 +193,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
 
         ivSearch.setOnClickListener {
             searchLocation(view)
-            llSave.visibility = View.VISIBLE
         }
 
         saveBtn.setOnClickListener {
             if (TextUtils.isEmpty(title.text)){
                 Toast.makeText(context, "Add some title too.", Toast.LENGTH_SHORT).show()
             } else {
+
+                DB.addData(title.text.toString().trim(),
+                    ((seekBar.progress * 500) + 500).toString(),
+                    "true",
+                    latSearch.toString(),
+                    longSearch.toString()
+                )
+                Toast.makeText(context, "Location Alert Added", Toast.LENGTH_SHORT).show()
+
                 mapCircle.radius = 0.0
                 llSave.visibility = View.GONE
                 search.text.clear()

@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".fragment.PlacesFragment">
 
-    <TextView
-        android:textSize="30dp"
-        android:gravity="center"
-        android:layout_centerInParent="true"
-        android:text="You have no alerts.\n\nSearch on the map to add atleast one location alert."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+<!--    <TextView-->
+<!--        android:textSize="30dp"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:text="You have no alerts.\n\nSearch on the map to add atleast one location alert."-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPlaces"
