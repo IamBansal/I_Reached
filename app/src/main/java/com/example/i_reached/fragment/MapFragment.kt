@@ -16,7 +16,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import com.example.i_reached.R
-import com.example.i_reached.SQLHelper
+import com.example.i_reached.helper.SQLHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*

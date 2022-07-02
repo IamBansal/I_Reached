@@ -1,7 +1,6 @@
 package com.example.i_reached.adapter
 
 import android.app.AlertDialog
-import android.content.ContentValues
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.i_reached.R
-import com.example.i_reached.SQLHelper
+import com.example.i_reached.helper.SQLHelper
 import com.example.i_reached.model.Alert
 import java.util.ArrayList
 

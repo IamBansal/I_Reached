@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.i_reached.R
-import com.example.i_reached.SQLHelper
+import com.example.i_reached.helper.SQLHelper
 import com.example.i_reached.adapter.AlertAdapter
 import com.example.i_reached.model.Alert
 import java.util.ArrayList

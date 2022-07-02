@@ -1,7 +1,8 @@
-package com.example.i_reached
+package com.example.i_reached.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.i_reached.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

@@ -1,10 +1,10 @@
-package com.example.i_reached
+package com.example.i_reached.activity
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
+import com.example.i_reached.R
 import com.example.i_reached.fragment.HelpFragment
 import com.example.i_reached.fragment.MapFragment
 import com.example.i_reached.fragment.PlacesFragment

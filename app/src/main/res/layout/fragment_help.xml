@@ -14,16 +14,16 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:gravity="center"
-        android:text="Alerts not working?"
+        android:text="What we do?"
         android:textColor="@color/black"
         android:textSize="30sp"
         android:textStyle="bold" />
 
     <TextView
-        android:layout_margin="8dp"
-        android:layout_below="@id/head"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_below="@id/head"
+        android:layout_margin="8dp"
+        android:text="Main motive of this app is to help the user with location updates.\n\nAll you have to do is to accept location permissions.\nThen you can search for any location or just click on the map to add desired location for the alert.\nAs soon as you click or search, you can then set the radius around your selected location for the reminder according to you.\nWe will remind you when your device will enter the boundary of the circle you set.\nSetting circle od large radius if you are moving fast is recommended.\nYou can turn off the alert if you don't want you to be notified.\n\nDeveloper Contact ->\n Email : abansal11ae@gmail.com\n Instagram : axtbansal" />
 
 </RelativeLayout>
