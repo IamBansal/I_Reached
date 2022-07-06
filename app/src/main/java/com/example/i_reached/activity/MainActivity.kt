@@ -1,8 +1,10 @@
 package com.example.i_reached.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.example.i_reached.R
 import com.example.i_reached.fragment.HelpFragment
@@ -42,7 +44,18 @@ class MainActivity : AppCompatActivity() {
             return@setOnNavigationItemSelectedListener true
         }
 
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MapFragment()).commit()
+//        val intent : Bundle? = intent.extras
+//        if(intent != null) {
+//            intent.getStringExtra("notify")
+//            val profileID = intent.getString("notify")
+//            getSharedPreferences("NOTIFY", MODE_PRIVATE).edit().putString("notify", profileID).apply()
+//            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, PlacesFragment()).commit()
+//        } else {
+//            //For setting map fragment as default fragment.
+//            Toast.makeText(this, "Null intent", Toast.LENGTH_SHORT).show()
+//            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MapFragment()).commit()
+//        }
+
 
         help = findViewById(R.id.help)
         help?.setOnClickListener {
