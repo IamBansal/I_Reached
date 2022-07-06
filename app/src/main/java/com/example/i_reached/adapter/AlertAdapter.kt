@@ -53,13 +53,12 @@ class AlertAdapter(private var context: Context, private var alertList: ArrayLis
         }
 
         holder.switch.setOnCheckedChangeListener { _, _ ->
-
             if (holder.switch.isChecked) {
-                val query = "UPDATE Alert  SET A_checked = true WHERE ID = ${alert.id}"
+                val query = "UPDATE Alert  SET A_checked = 'true' WHERE ID = ${alert.id}"
                 DB.writableDatabase.execSQL(query)
                 Toast.makeText(context, "Switch is turned on.", Toast.LENGTH_SHORT).show()
             } else {
-                val query = "UPDATE Alert  SET A_checked = false WHERE ID = ${alert.id}"
+                val query = "UPDATE Alert  SET A_checked = 'false' WHERE ID = ${alert.id}"
                 DB.writableDatabase.execSQL(query)
                 Toast.makeText(context, "Switch is turned off.", Toast.LENGTH_SHORT).show()
             }

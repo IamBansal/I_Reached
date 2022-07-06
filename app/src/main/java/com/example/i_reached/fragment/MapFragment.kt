@@ -38,15 +38,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
     private lateinit var googleMap: GoogleMap
     private lateinit var search: EditText
     private lateinit var ivSearch: ImageView
-    private lateinit var llSave : LinearLayout
-    private lateinit var title : EditText
+    private lateinit var llSave: LinearLayout
+    private lateinit var title: EditText
     private lateinit var seekBar: SeekBar
-    private lateinit var coordinateTxt : TextView
-    private lateinit var radiusText : TextView
-    private lateinit var saveBtn : Button
-    private var latSearch : Double? = null
-    private var longSearch : Double? = null
-    private lateinit var mapCircle : Circle
+    private lateinit var coordinateTxt: TextView
+    private lateinit var coordinateTxtLat: TextView
+    private lateinit var coordinateTxtLong: TextView
+    private lateinit var radiusText: TextView
+    private lateinit var saveBtn: Button
+    private var latSearch: Double? = null
+    private var longSearch: Double? = null
+    private lateinit var mapCircle: Circle
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,8 +95,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         googleMap.isMyLocationEnabled = true
         googleMap.setOnMyLocationButtonClickListener(this)
         googleMap.setOnMyLocationClickListener(this)
+        googleMap.uiSettings.isCompassEnabled = true
+        googleMap.uiSettings.isRotateGesturesEnabled = true
+        googleMap.uiSettings.isZoomControlsEnabled = true
+        googleMap.uiSettings.isZoomGesturesEnabled = true
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())
         fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
             val location: Location = task.result
             val myLocation = LatLng(location.latitude, location.longitude)
@@ -112,8 +119,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
             )
             googleMap.addMarker(MarkerOptions().position(it))
             googleMap.animateCamera(CameraUpdateFactory.newLatLng(it))
-            coordinateTxt.text =
-                "Coordinates : (${it.latitude.toFloat()}, ${it.longitude.toFloat()})"
+            coordinateTxtLat.text = it.latitude.toFloat().toString()
+            coordinateTxtLong.text = it.longitude.toFloat().toString()
+
             llSave.visibility = View.VISIBLE
         }
 
@@ -145,7 +153,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
                 e.printStackTrace()
                 Toast.makeText(context, "Error : ${e.message}", Toast.LENGTH_SHORT).show()
             }
-            if(list!!.isEmpty()){
+            if (list!!.isEmpty()) {
                 Toast.makeText(context, "No results found.", Toast.LENGTH_SHORT).show()
             } else {
                 llSave.visibility = View.VISIBLE
@@ -162,8 +170,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
                 )
                 googleMap.addMarker(MarkerOptions().position(latLng).title(locationText))
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-                coordinateTxt.text =
-                    "Coordinates : (${address.latitude.toFloat()}, ${address.longitude.toFloat()})"
+                coordinateTxtLat.text = address.latitude.toFloat().toString()
+                coordinateTxtLong.text = address.longitude.toFloat().toString()
             }
         }
 
@@ -189,6 +197,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         radiusText = view.findViewById(R.id.tvRadius)
         seekBar = view.findViewById(R.id.seekbar)
         coordinateTxt = view.findViewById(R.id.tvCoordinates)
+        coordinateTxtLat = view.findViewById(R.id.tvCoordinatesLat)
+        coordinateTxtLong = view.findViewById(R.id.tvCoordinatesLong)
         saveBtn = view.findViewById(R.id.btnSave)
 
         ivSearch.setOnClickListener {
@@ -196,15 +206,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         }
 
         saveBtn.setOnClickListener {
-            if (TextUtils.isEmpty(title.text)){
+            if (TextUtils.isEmpty(title.text)) {
                 Toast.makeText(context, "Add some title too.", Toast.LENGTH_SHORT).show()
             } else {
 
-                DB.addData(title.text.toString().trim(),
+                DB.addData(
+                    title.text.toString().trim(),
                     ((seekBar.progress * 500) + 500).toString(),
                     "true",
-                    latSearch.toString(),
-                    longSearch.toString()
+                    coordinateTxtLat.text.toString().trim(),
+                    coordinateTxtLong.text.toString().trim()
                 )
                 Toast.makeText(context, "Location Alert Added", Toast.LENGTH_SHORT).show()
 
@@ -214,13 +225,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
             }
         }
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-               mapCircle.radius = ((seekBar.progress * 500) + 500).toDouble()
+                mapCircle.radius = ((seekBar.progress * 500) + 500).toDouble()
                 radiusText.text = mapCircle.radius.toString() + " m"
             }
         })
@@ -258,12 +269,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
     }
 
     override fun onMyLocationButtonClick(): Boolean {
-//        Toast.makeText(context, "MyLocation button clicked", Toast.LENGTH_SHORT).show()
         return false
     }
 
-    override fun onMyLocationClick(p0: Location) {
-//        Toast.makeText(context, "Current location: $p0\n", Toast.LENGTH_LONG).show()
-    }
+    override fun onMyLocationClick(p0: Location) {}
 
 }

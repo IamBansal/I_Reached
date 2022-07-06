@@ -57,7 +57,7 @@ class PlacesFragment : Fragment() {
 
     private fun showData(data: Cursor, alertList: ArrayList<Alert>) {
         if (data.count == 0) {
-            Toast.makeText(context, "There is no item in notes.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "There is no item in alerts.", Toast.LENGTH_SHORT).show()
         }
         while (data.moveToNext()) {
             alertList.add(Alert(data.getString(0), data.getString(1), data.getString(2), data.getString(3), data.getString(4), data.getString(5)))
