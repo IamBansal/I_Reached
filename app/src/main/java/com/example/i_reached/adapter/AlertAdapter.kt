@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.i_reached.R
 import com.example.i_reached.helper.SQLHelper
 import com.example.i_reached.model.Alert
-import java.util.ArrayList
 
 class AlertAdapter(private var context: Context, private var alertList: ArrayList<Alert>) :
     RecyclerView.Adapter<AlertAdapter.ViewHolder>() {
@@ -56,11 +55,11 @@ class AlertAdapter(private var context: Context, private var alertList: ArrayLis
             if (holder.switch.isChecked) {
                 val query = "UPDATE Alert  SET A_checked = 'true' WHERE ID = ${alert.id}"
                 DB.writableDatabase.execSQL(query)
-                Toast.makeText(context, "Switch is turned on.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Alert : ${alert.title} is turned on.", Toast.LENGTH_SHORT).show()
             } else {
                 val query = "UPDATE Alert  SET A_checked = 'false' WHERE ID = ${alert.id}"
                 DB.writableDatabase.execSQL(query)
-                Toast.makeText(context, "Switch is turned off.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Alert : ${alert.title} is turned off.", Toast.LENGTH_SHORT).show()
             }
         }
 

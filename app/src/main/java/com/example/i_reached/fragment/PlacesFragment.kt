@@ -15,20 +15,7 @@ import com.example.i_reached.adapter.AlertAdapter
 import com.example.i_reached.model.Alert
 import java.util.ArrayList
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 class PlacesFragment : Fragment() {
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var alertAdapter: AlertAdapter
@@ -62,25 +49,5 @@ class PlacesFragment : Fragment() {
         while (data.moveToNext()) {
             alertList.add(Alert(data.getString(0), data.getString(1), data.getString(2), data.getString(3), data.getString(4), data.getString(5)))
         }
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PlacesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PlacesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

@@ -14,8 +14,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    private var help : ImageView? = null
-    private var bottomNavigationView : BottomNavigationView? = null
+    private var help: ImageView? = null
+    private var bottomNavigationView: BottomNavigationView? = null
     private lateinit var toolbar: Toolbar
 
     override fun onBackPressed() {
@@ -33,37 +33,40 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigationView = findViewById(R.id.bottomm)
         bottomNavigationView?.setOnNavigationItemSelectedListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.mapItem -> {
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MapFragment()).commit()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, MapFragment()).commit()
                 }
                 R.id.location -> {
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container, PlacesFragment()).commit()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, PlacesFragment()).commit()
                 }
             }
             return@setOnNavigationItemSelectedListener true
         }
 
-//        val intent : Bundle? = intent.extras
-//        if(intent != null) {
-//            intent.getStringExtra("notify")
-//            val profileID = intent.getString("notify")
-//            getSharedPreferences("NOTIFY", MODE_PRIVATE).edit().putString("notify", profileID).apply()
-//            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, PlacesFragment()).commit()
-//        } else {
-//            //For setting map fragment as default fragment.
-//            Toast.makeText(this, "Null intent", Toast.LENGTH_SHORT).show()
-//            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MapFragment()).commit()
-//        }
-
+        //For notification tap.
+        val intent: Bundle? = intent.extras
+        if (intent?.getString("notify") == "notification") {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, PlacesFragment()).commit()
+            bottomNavigationView?.selectedItemId = R.id.location
+        } else {
+            //For setting map fragment as default fragment.
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, MapFragment()).commit()
+        }
 
         help = findViewById(R.id.help)
         help?.setOnClickListener {
-            if(help?.tag!! == "open"){
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MapFragment()).commit()
+            if (help?.tag!! == "open") {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, MapFragment()).commit()
                 help?.tag = "close"
             } else {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HelpFragment()).commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, HelpFragment()).commit()
                 help?.tag = "open"
             }
         }

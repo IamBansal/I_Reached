@@ -5,7 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,21 +15,22 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.media.MediaPlayer
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.fragment.app.Fragment
 import com.example.i_reached.R
 import com.example.i_reached.activity.MainActivity
 import com.example.i_reached.helper.SQLHelper
-import com.example.i_reached.model.Alert
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
@@ -38,10 +39,7 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import java.io.IOException
-import java.lang.Exception
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener {
@@ -64,15 +62,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
     private lateinit var mapCircle: Circle
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-
-    }
-
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -87,21 +76,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         googleMap = p0
 
         if (ActivityCompat.checkSelfPermission(
-                requireContext(),
+                requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                requireContext(),
+                requireActivity(),
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
             return
         }
 
@@ -178,52 +159,49 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
                     distance
                 )
                 if (distance[0] <= data.getString(2).toFloat() && data.getString(3) == "true") {
-//                    notifyUser(data)
-                    val mediaPlayer = MediaPlayer.create(context, R.raw.sound)
-                    mediaPlayer.start()
-                    break
+                        notifyUser(data)
+//                        val mediaPlayer = MediaPlayer.create((activity as MainActivity).applicationContext, R.raw.sound)
+//                        mediaPlayer.start()
+                        break
                 }
             }
         }
     }
 
-//    private fun notifyUser(data: Cursor) {
-//
-//        val intent = Intent(context, MainActivity::class.java).apply {
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//        }
-//        intent.putExtra("notify", "notification")
-//        intent.action = Intent.ACTION_MAIN
-//        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-////        startActivity(intent)
-//        val pendingIntent =
-//            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-//
-//        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            NotificationCompat.Builder(requireContext(), "channel")
-//        } else {
-//            TODO("VERSION.SDK_INT < O")
-//        }
-//        builder.setContentTitle("Approaching Location...")
-//            .setContentText("You are approaching your location of alert ${data.getString(1)}.")
-//            .setSmallIcon(R.drawable.ic_baseline_location_on_24)
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .setContentIntent(pendingIntent)
-//            .setAutoCancel(true)
-//
-//        val notificationManager =
-//            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        val channel =
-//            NotificationChannel("channel_id", "nothing", NotificationManager.IMPORTANCE_HIGH)
-//        notificationManager.createNotificationChannel(channel)
-//        builder.setChannelId("channel_id")
-//        notificationManager.notify(0, builder.build())
-//
-//
-//        val mediaPlayer = MediaPlayer.create(context, R.raw.sound)
-//        mediaPlayer.start()
-//
-//    }
+    private fun notifyUser(data: Cursor) {
+        if(isAdded && context != null) {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+                .apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+            intent.putExtra("notify", "notification")
+            intent.action = Intent.ACTION_MAIN
+            intent.addCategory(Intent.CATEGORY_LAUNCHER)
+            val pendingIntent =
+                getActivity(context, 0, intent, 0)
+            val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationCompat.Builder(requireContext(), "channel")
+            } else {
+                TODO("VERSION.SDK_INT < O")
+            }
+            builder.setContentTitle("Approaching Location...")
+                .setContentText("You are approaching your location of alert ${data.getString(1)}.")
+                .setSmallIcon(R.drawable.ic_baseline_location_on_24)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+
+            val notificationManager =
+                context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel =
+                NotificationChannel("channel_id", "nothing", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+            builder.setChannelId("channel_id")
+            notificationManager.notify(0, builder.build())
+        } else {
+            Log.i("Error", "No fragment attached to context.")
+        }
+    }
 
     private fun requestPermission() {
         ActivityCompat.requestPermissions(
@@ -340,6 +318,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         })
 
         mapView.onCreate(savedInstanceState)
+        mapView.onPause()
         mapView.onResume()
         try {
             MapsInitializer.initialize(requireContext())
@@ -349,26 +328,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         mapView.getMapAsync(this)
 
         return view
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MapFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MapFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 
     override fun onMyLocationButtonClick(): Boolean {
