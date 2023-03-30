@@ -1,8 +1,9 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.i_reached.fragment
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent.getActivity
@@ -14,9 +15,6 @@ import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.media.MediaPlayer
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -30,6 +28,7 @@ import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import com.example.i_reached.R
 import com.example.i_reached.activity.MainActivity
+import com.example.i_reached.databinding.FragmentMapBinding
 import com.example.i_reached.helper.SQLHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -39,26 +38,13 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import java.io.IOException
-
+import java.util.*
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener {
 
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentMapBinding
     private lateinit var googleMap: GoogleMap
-    private lateinit var search: EditText
-    private lateinit var ivSearch: ImageView
-    private lateinit var llSave: LinearLayout
-    private lateinit var title: EditText
-    private lateinit var seekBar: SeekBar
-    private lateinit var coordinateTxt: TextView
-    private lateinit var coordinateTxtLat: TextView
-    private lateinit var coordinateTxtLong: TextView
-    private lateinit var radiusText: TextView
-    private lateinit var saveBtn: Button
-    private var latSearch: Double? = null
-    private var longSearch: Double? = null
     private lateinit var mapCircle: Circle
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
@@ -107,10 +93,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
             )
             googleMap.addMarker(MarkerOptions().position(it))
             googleMap.animateCamera(CameraUpdateFactory.newLatLng(it))
-            coordinateTxtLat.text = it.latitude.toFloat().toString()
-            coordinateTxtLong.text = it.longitude.toFloat().toString()
+            binding.tvCoordinatesLat.text = it.latitude.toFloat().toString()
 
-            llSave.visibility = View.VISIBLE
+            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+            val addresses: List<Address>? =
+                geocoder.getFromLocation(it.latitude, it.longitude, 1)
+            binding.tvLocation.text = addresses!![0].getAddressLine(0)
+
+            binding.tvCoordinatesLong.text = it.longitude.toFloat().toString()
+            binding.llSave.visibility = View.VISIBLE
         }
 
     }
@@ -214,15 +205,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
         )
     }
 
-    private fun searchLocation(view: View) {
+    private fun searchLocation() {
 
-        val locationText = search.text.toString()
+        val locationText = binding.search.text.toString()
         var list: List<Address>? = null
 
         if (TextUtils.isEmpty(locationText) || locationText == "") {
             Toast.makeText(context, "Enter location", Toast.LENGTH_SHORT).show()
         } else {
-            val geoCoder = Geocoder(this@MapFragment.context)
+            val geoCoder = Geocoder(requireContext())
             try {
                 list = geoCoder.getFromLocationName(locationText, 1)
             } catch (e: IOException) {
@@ -232,11 +223,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
             if (list!!.isEmpty()) {
                 Toast.makeText(context, "No results found.", Toast.LENGTH_SHORT).show()
             } else {
-                llSave.visibility = View.VISIBLE
+                binding.llSave.visibility = View.VISIBLE
                 val address = list[0]
                 val latLng = LatLng(address.latitude, address.longitude)
-                latSearch = address.latitude
-                longSearch = address.longitude
                 mapCircle = googleMap.addCircle(
                     CircleOptions().center(latLng)
                         .radius(500.0)
@@ -246,88 +235,75 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButton
                 )
                 googleMap.addMarker(MarkerOptions().position(latLng).title(locationText))
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-                coordinateTxtLat.text = address.latitude.toFloat().toString()
-                coordinateTxtLong.text = address.longitude.toFloat().toString()
+                binding.tvCoordinatesLat.text = address.latitude.toFloat().toString()
+                binding.tvCoordinatesLong.text = address.longitude.toFloat().toString()
+                binding.tvLocation.text = address.getAddressLine(0)
             }
         }
 
     }
 
-//    override fun onPause() {
-//        super.onPause()
-//        getCurrentLocation(SQLHelper(requireContext()))
-//    }
-
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        binding = FragmentMapBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val view = inflater.inflate(R.layout.fragment_map, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val DB = SQLHelper(requireContext())
 
         requestPermission()
 
-        val mapView = view.findViewById<MapView>(R.id.map)
-        search = view.findViewById(R.id.search)
-        ivSearch = view.findViewById(R.id.ivSearch)
-        llSave = view.findViewById(R.id.llSave)
-        title = view.findViewById(R.id.etTitle)
-        radiusText = view.findViewById(R.id.tvRadius)
-        seekBar = view.findViewById(R.id.seekbar)
-        coordinateTxt = view.findViewById(R.id.tvCoordinates)
-        coordinateTxtLat = view.findViewById(R.id.tvCoordinatesLat)
-        coordinateTxtLong = view.findViewById(R.id.tvCoordinatesLong)
-        saveBtn = view.findViewById(R.id.btnSave)
-
-        ivSearch.setOnClickListener {
-            searchLocation(view)
+        binding.ivSearch.setOnClickListener {
+            searchLocation()
         }
 
-        saveBtn.setOnClickListener {
-            if (TextUtils.isEmpty(title.text)) {
+        binding.btnSave.setOnClickListener {
+            if (TextUtils.isEmpty(binding.etTitle.text)) {
                 Toast.makeText(context, "Add some title too.", Toast.LENGTH_SHORT).show()
             } else {
 
                 DB.addData(
-                    title.text.toString().trim(),
-                    ((seekBar.progress * 500) + 500).toString(),
+                    binding.etTitle.text.toString().trim(),
+                    ((binding.seekbar.progress * 500) + 500).toString(),
                     "true",
-                    coordinateTxtLat.text.toString().trim(),
-                    coordinateTxtLong.text.toString().trim()
+                    binding.tvCoordinatesLat.text.toString().trim(),
+                    binding.tvCoordinatesLong.text.toString().trim()
                 )
                 Toast.makeText(context, "Location Alert Added", Toast.LENGTH_SHORT).show()
 
                 mapCircle.radius = 0.0
-                llSave.visibility = View.GONE
-                search.text.clear()
+                binding.llSave.visibility = View.GONE
+                binding.search.text.clear()
             }
         }
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-                mapCircle.radius = ((seekBar.progress * 500) + 500).toDouble()
-                radiusText.text = mapCircle.radius.toString() + " m"
+                mapCircle.radius = ((binding.seekbar.progress * 500) + 500).toDouble()
+                "${mapCircle.radius} m".also { binding.tvRadius.text = it }
             }
         })
 
-        mapView.onCreate(savedInstanceState)
-        mapView.onPause()
-        mapView.onResume()
+        binding.map.onCreate(savedInstanceState)
+        binding.map.onPause()
+        binding.map.onResume()
         try {
             MapsInitializer.initialize(requireContext())
         } catch (e: Exception) {
             e.stackTrace
         }
-        mapView.getMapAsync(this)
+        binding.map.getMapAsync(this)
 
-        return view
     }
 
     override fun onMyLocationButtonClick(): Boolean {

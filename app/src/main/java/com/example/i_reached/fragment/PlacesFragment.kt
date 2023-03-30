@@ -12,12 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.i_reached.R
 import com.example.i_reached.helper.SQLHelper
 import com.example.i_reached.adapter.AlertAdapter
+import com.example.i_reached.databinding.FragmentPlacesBinding
 import com.example.i_reached.model.Alert
 import java.util.ArrayList
 
 class PlacesFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var binding: FragmentPlacesBinding
     private lateinit var alertAdapter: AlertAdapter
     private lateinit var alertList: ArrayList<Alert>
     private lateinit var DB : SQLHelper
@@ -26,20 +27,33 @@ class PlacesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val layout =  inflater.inflate(R.layout.fragment_places, container, false)
+    ): View {
+        binding = FragmentPlacesBinding.inflate(inflater, container, false)
+//        val layout =  inflater.inflate(R.layout.fragment_places, container, false)
 
-        recyclerView = layout.findViewById(R.id.recyclerViewPlaces)
+//        recyclerView = layout.findViewById(R.id.recyclerViewPlaces)
+//        alertList = ArrayList()
+//        alertAdapter = AlertAdapter(requireContext(), alertList)
+//        binding.recyclerViewPlaces.adapter = alertAdapter
+//        binding.recyclerViewPlaces.layoutManager = LinearLayoutManager(context)
+//        DB = SQLHelper(requireContext())
+//        data = DB.dataGetter
+//
+//        showData(data, alertList)
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         alertList = ArrayList()
         alertAdapter = AlertAdapter(requireContext(), alertList)
-        recyclerView.adapter = alertAdapter
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerViewPlaces.adapter = alertAdapter
+        binding.recyclerViewPlaces.layoutManager = LinearLayoutManager(context)
         DB = SQLHelper(requireContext())
         data = DB.dataGetter
 
         showData(data, alertList)
-
-        return layout
     }
 
     private fun showData(data: Cursor, alertList: ArrayList<Alert>) {

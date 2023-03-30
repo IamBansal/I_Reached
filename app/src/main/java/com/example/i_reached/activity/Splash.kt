@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import com.example.i_reached.R
 
 class Splash : AppCompatActivity() {
@@ -11,7 +12,7 @@ class Splash : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        Handler().postDelayed({startActivity(Intent(this, MainActivity::class.java))}, 2500)
+        Handler(Looper.getMainLooper()).postDelayed({startActivity(Intent(this, MainActivity::class.java))}, 2500)
 
     }
 }

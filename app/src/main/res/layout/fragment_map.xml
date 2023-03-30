@@ -22,8 +22,10 @@
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@id/ivSearch"
+            android:autofillHints="postalAddress"
             android:backgroundTint="@color/white"
             android:hint="Search for locations"
+            android:inputType="textPostalAddress"
             android:padding="10dp" />
 
         <ImageView
@@ -46,7 +48,6 @@
         android:layout_below="@id/ll" />
 
     <LinearLayout
-        android:visibility="gone"
         android:id="@+id/llSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,6 +64,7 @@
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="10dp"
             android:hint="Title"
+            android:inputType="text"
             android:maxLines="1"
             android:padding="10dp" />
 
@@ -89,7 +91,6 @@
                 android:layout_margin="5dp"
                 android:layout_toStartOf="@id/tvRadius"
                 android:layout_toEndOf="@id/tvText"
-                android:layout_weight="0"
                 android:max="5"
                 android:progress="0" />
 
@@ -100,11 +101,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
                 android:layout_marginEnd="15dp"
-                android:text="500 m" />
+                tools:text="500 m" />
 
         </RelativeLayout>
 
         <LinearLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -114,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:text="Coordinates : " />
+                tools:text="Coordinates : " />
 
             <TextView
                 android:id="@+id/tvCoordinatesLat"
@@ -130,7 +132,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
-                android:text=" , " />
+                tools:text=" , " />
 
             <TextView
                 android:id="@+id/tvCoordinatesLong"
@@ -141,6 +143,14 @@
                 android:layout_marginBottom="15dp" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvLocation"
+            tools:text="Location comes here"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btnSave"
